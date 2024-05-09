@@ -1,18 +1,21 @@
 const express = require("express");
-const { createClient } = require("@supabase/supabase-js");
+const { Pool } = require("pg");
 require("dotenv").config();
 
 const app = express();
 const port = 3000;
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
-
-
-
-app.get("/", (req, res) => {
-  res.send("Hello, world!");
+const pool = new Pool({
+  user: process.env.POSTGRES_USER,
+  host: process.env.POSTGRES_HOST,
+  database: process.env.POSTGRES_DB,
+  password: process.env.POSTGRES_PASSWORD,
+  port: process.env.POSTGRES_PORT,
 });
 
-app.listen(port);
+app.set("view engine", "ejs");
+
+app.get("/", async (req, res) => {
+  res.render("index");
+});
+
+app.listen(port, () => console.log(`http://localhost:${port}`));
