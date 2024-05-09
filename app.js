@@ -21,8 +21,32 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/grade", async (req, res) => {
-  const registrationNumber = req.body.registrationNumber;
-  res.render("grade", { registrationNumber });
+  const registration_number = req.body.registrationNumber;
+  try {
+    const client = await pool.connect();
+    const result = await client.query(
+      "SELECT * FROM student_scores WHERE registration_number = $1",
+      [registration_number]
+    );
+    const student = result.rows[0];
+    client.release();
+
+    const { first_name, middle_name, last_name, department } = student;
+    res.render("grade", {
+      registration_number,
+      first_name,
+      middle_name,
+      last_name,
+      department,
+    });
+  } catch (error) {
+    console.error("Error");
+    res.redirect("/");
+  }
+});
+
+app.post("/score", async (req, res) => {
+  const score = req.body.score;
 });
 
 app.listen(port, () => console.log(`http://localhost:${port}`));
