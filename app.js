@@ -113,4 +113,17 @@ app.post("/new_student", async (req, res) => {
   res.redirect("/");
 });
 
+app.get("/download", async (req, res) => {
+  try {
+    const client = await pool.connect();
+    const results = await client.query("SELECT * FROM student_scores");
+    const json_data = results.rows;
+    console.log(json_data);
+    client.release();
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Content-Disposition", "attachment; filename=data.json");
+    res.send(JSON.stringify(json_data));
+  } catch (error) {}
+});
+
 app.listen(port, () => console.log(`http://localhost:${port}`));
