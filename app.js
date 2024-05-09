@@ -22,7 +22,6 @@ app.get("/", async (req, res) => {
 
 app.post("/grade", async (req, res) => {
   const registrationNumber = req.body.registrationNumber;
-  console.log(registrationNumber);
   res.render("grade", { registrationNumber });
 });
 
