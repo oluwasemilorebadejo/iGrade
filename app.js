@@ -13,6 +13,26 @@ const pool = new Pool({
   port: process.env.POSTGRES_PORT,
 });
 
+const departments = [
+  "Building",
+  "Chemical Engineering",
+  "Food Science and Engineering",
+  "Education",
+  "Agricultural and Environmental Engineering",
+  "Geology",
+  "Botany",
+  "Civil Engineering",
+  "Surveying and Geoinformatics",
+  "Mechanical Engineering and Aerospace Engineering",
+  "Material Science and Engineering",
+  "Microbiology",
+  "Physics and Physics Engineering",
+  "Computer Science and Engineering",
+  "Postgraduate Computer Science and Engineering",
+  "Mathematics",
+  "Zoology",
+];
+
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -61,18 +81,33 @@ app.post("/score", async (req, res) => {
 });
 
 app.get("/register", async (req, res) => {
-  res.render("register");
+  res.render("register", { departments });
 });
 
 app.post("/new_student", async (req, res) => {
-  const { registration_number, first_name, middle_name, last_name, score } =
-    req.body;
+  const {
+    registration_number,
+    first_name,
+    middle_name,
+    last_name,
+    department,
+    score,
+  } = req.body;
+  console.log(registration_number);
+  console.log(first_name);
 
   try {
     const client = await pool.connect();
     await client.query(
-      "INSERT INTO student_scores (registration_number, first_name, middle_name, last_name, score) VALUES ($1, $2, $3, $4, $5)",
-      [registration_number, first_name, middle_name, last_name, score]
+      "INSERT INTO student_scores (registration_number, first_name, middle_name, last_name, department, score) VALUES ($1, $2, $3, $4, $5, $6)",
+      [
+        registration_number,
+        first_name,
+        middle_name,
+        last_name,
+        department,
+        score,
+      ]
     );
     client.release();
   } catch (error) {}
