@@ -93,8 +93,6 @@ app.post("/new_student", async (req, res) => {
     department,
     score,
   } = req.body;
-  console.log(registration_number);
-  console.log(first_name);
 
   try {
     const client = await pool.connect();
