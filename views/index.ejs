@@ -18,18 +18,26 @@
   </style>
   <body>
     <div class="container-md">
-      <div class="mb-3">
-        <label for="Reg No" class="form-label">Reg No:</label>
-        <input
-          type="text"
-          class="form-control"
-          id="Reg No"
-          placeholder="DEP/20XX/XXX"
-        />
-        <div class="d-grid gap-2">
-          <input class="btn btn-primary" type="submit" value="Submit" />
+      <form action="/grade" method="post">
+        <div class="input-group mb-3">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Registration number"
+            aria-label="Registration number"
+            aria-describedby="button-addon2"
+            id="registrationNumber"
+            name="registrationNumber"
+          />
+          <button
+            class="btn btn-outline-primary"
+            type="submit"
+            id="button-addon2"
+          >
+            Submit
+          </button>
         </div>
-      </div>
+      </form>
     </div>
   </body>
 </html>

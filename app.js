@@ -1,4 +1,5 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const { Pool } = require("pg");
 require("dotenv").config();
 
@@ -13,9 +14,16 @@ const pool = new Pool({
 });
 
 app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get("/", async (req, res) => {
   res.render("index");
+});
+
+app.post("/grade", async (req, res) => {
+  const registrationNumber = req.body.registrationNumber;
+  console.log(registrationNumber);
+  res.render("grade", { registrationNumber });
 });
 
 app.listen(port, () => console.log(`http://localhost:${port}`));
