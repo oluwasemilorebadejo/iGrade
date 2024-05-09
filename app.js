@@ -21,7 +21,8 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/grade", async (req, res) => {
-  const registration_number = req.body.registrationNumber;
+  const registration_number = req.body.registration_number;
+
   try {
     const client = await pool.connect();
     const result = await client.query(
@@ -40,13 +41,23 @@ app.post("/grade", async (req, res) => {
       department,
     });
   } catch (error) {
-    console.error("Error");
     res.redirect("/");
   }
 });
 
 app.post("/score", async (req, res) => {
   const score = req.body.score;
+  const registration_number = req.body.registration_number;
+
+  try {
+    const client = await pool.connect();
+    await client.query(
+      "UPDATE student_scores SET score = $1 WHERE registration_number = $2",
+      [score, registration_number]
+    );
+    client.release();
+  } catch (error) {}
+  res.redirect("/");
 });
 
 app.listen(port, () => console.log(`http://localhost:${port}`));

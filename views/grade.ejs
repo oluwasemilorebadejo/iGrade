@@ -33,7 +33,7 @@
           <p class="card-text"><%= middle_name %></p>
           <h6 class="card-subtitle mb-2 text-body-secondary">Department</h6>
           <p class="card-text"><%= department %></p>
-          <form action="/" method="post">
+          <form action="/score" method="post">
             <div class="input-group mb-3">
               <input
                 type="text"
@@ -43,6 +43,11 @@
                 aria-describedby="button-addon2"
                 id="score"
                 name="score"
+              />
+              <input
+                type="hidden"
+                name="registration_number"
+                value=<%= registration_number %>
               />
               <button
                 class="btn btn-outline-primary"
