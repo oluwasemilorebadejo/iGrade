@@ -46,8 +46,7 @@ app.post("/grade", async (req, res) => {
 });
 
 app.post("/score", async (req, res) => {
-  const score = req.body.score;
-  const registration_number = req.body.registration_number;
+  const { score, registration_number } = req.body;
 
   try {
     const client = await pool.connect();
@@ -57,6 +56,27 @@ app.post("/score", async (req, res) => {
     );
     client.release();
   } catch (error) {}
+
+  res.redirect("/");
+});
+
+app.get("/register", async (req, res) => {
+  res.render("register");
+});
+
+app.post("/new_student", async (req, res) => {
+  const { registration_number, first_name, middle_name, last_name, score } =
+    req.body;
+
+  try {
+    const client = await pool.connect();
+    await client.query(
+      "INSERT INTO student_scores (registration_number, first_name, middle_name, last_name, score) VALUES ($1, $2, $3, $4, $5)",
+      [registration_number, first_name, middle_name, last_name, score]
+    );
+    client.release();
+  } catch (error) {}
+
   res.redirect("/");
 });
 
