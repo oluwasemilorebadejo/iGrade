@@ -128,7 +128,6 @@ app.get("/download", async (req, res) => {
     const client = await pool.connect();
     const results = await client.query("SELECT * FROM student_scores");
     const json_data = results.rows;
-    console.log(json_data);
     client.release();
     res.setHeader("Content-Type", "application/json");
     res.setHeader("Content-Disposition", "attachment; filename=data.json");
