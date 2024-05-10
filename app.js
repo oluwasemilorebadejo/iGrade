@@ -38,12 +38,12 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get("/", async (req, res) => {
-  let message = req.body.message;
-  if (typeof message === "undefined") message = "";
+  let message = req.query.message || "";
   res.render("index", { message });
 });
 
 app.post("/grade", async (req, res) => {
+  let message;
   const registration_number = req.body.registration_number;
 
   try {
@@ -64,11 +64,13 @@ app.post("/grade", async (req, res) => {
       department,
     });
   } catch (error) {
-    res.redirect("/");
+    message = "Could not score student.";
+    res.redirect(`/?message=${message}`);
   }
 });
 
 app.post("/score", async (req, res) => {
+  let message;
   const { score, registration_number } = req.body;
 
   try {
@@ -78,9 +80,12 @@ app.post("/score", async (req, res) => {
       [score, registration_number]
     );
     client.release();
-  } catch (error) {}
+    message = `Set ${registration_number} score to ${score}.`;
+  } catch (error) {
+    message = `Could not set score for ${registration_number}.`;
+  }
 
-  res.redirect("/");
+  res.redirect(`/?message=${message}`);
 });
 
 app.get("/register", async (req, res) => {
@@ -88,6 +93,7 @@ app.get("/register", async (req, res) => {
 });
 
 app.post("/new_student", async (req, res) => {
+  let message;
   const {
     registration_number,
     first_name,
@@ -111,9 +117,10 @@ app.post("/new_student", async (req, res) => {
       ]
     );
     client.release();
+    message = `Created record for ${registration_number}.`;
   } catch (error) {}
 
-  res.redirect("/");
+  res.redirect(`/?message=${message}`);
 });
 
 app.get("/download", async (req, res) => {
@@ -134,6 +141,7 @@ app.get("/passcode", async (req, res) => {
 });
 
 app.post("/reset", async (req, res) => {
+  let message;
   const passcode = req.body.passcode;
 
   if (passcode === process.env.PASSCODE) {
@@ -141,10 +149,13 @@ app.post("/reset", async (req, res) => {
       const client = await pool.connect();
       await client.query("UPDATE student_scores SET score = 0");
       client.release();
-    } catch (error) {}
+      message = "Reset students' scores.";
+    } catch (error) {
+      message = "Passcode incorrect.";
+    }
   }
 
-  res.redirect("/");
+  res.redirect(`/?message=${message}`);
 });
 
 app.listen(port, () => console.log(`http://localhost:${port}`));
