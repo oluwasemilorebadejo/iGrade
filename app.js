@@ -38,7 +38,9 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get("/", async (req, res) => {
-  res.render("index");
+  let message = req.body.message;
+  if (typeof message === "undefined") message = "";
+  res.render("index", { message });
 });
 
 app.post("/grade", async (req, res) => {

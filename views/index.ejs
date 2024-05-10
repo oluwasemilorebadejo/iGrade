@@ -62,5 +62,15 @@
         </div>
       </form>
     </div>
+    <p class="text-center" id="message"><%= message %></p>
+    <script>
+      const messageElement = document.getElementById("message");
+      function showAndHideMessage() {
+        messageElement.style.display = "block";
+      }
+      setTimeout(function () {
+        messageElement.style.display = "none";
+      }, 3000);
+    </script>
   </body>
 </html>
