@@ -15,8 +15,14 @@
   <style>
     body {
       padding-top: 50px;
-      padding-left: 40px;
-      padding-right: 40px;
+      padding-left: 30px;
+      padding-right: 30px;
+    }
+    #register-submit {
+      float: right;
+    }
+    p#message {
+      margin-top: 100px; /* Adjust the value for desired distance */
     }
   </style>
   <body>
@@ -28,8 +34,8 @@
               src="logo.png
           "
               alt="Logo"
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               class="d-inline-block align-text-top"
             />
             gradr
@@ -58,15 +64,15 @@
             name="registration_number"
             required
           />
-          <div
-            class="btn-group btn-group-sm"
-            role="group"
-            aria-label="Basic outlined example"
-            id="button-addon2"
-          >
-            <a href="/register" class="btn btn-outline-primary">Register</a>
-            <button type="submit" class="btn btn-primary">Submit</button>
-          </div>
+        </div>
+        <div
+          class="btn-group btn-group-sm"
+          role="group"
+          aria-label="Basic outlined example"
+          id="register-submit"
+        >
+          <a href="/register" class="btn btn-outline-primary">Register</a>
+          <button type="submit" class="btn btn-primary">Submit</button>
         </div>
       </form>
     </div>
