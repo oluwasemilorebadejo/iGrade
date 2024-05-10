@@ -127,4 +127,22 @@ app.get("/download", async (req, res) => {
   } catch (error) {}
 });
 
+app.get("/passcode", async (req, res) => {
+  res.render("passcode");
+});
+
+app.post("/reset", async (req, res) => {
+  const passcode = req.body.passcode;
+
+  if (passcode === process.env.PASSCODE) {
+    try {
+      const client = await pool.connect();
+      await client.query("UPDATE student_scores SET score = 0");
+      client.release();
+    } catch (error) {}
+  }
+
+  res.redirect("/");
+});
+
 app.listen(port, () => console.log(`http://localhost:${port}`));
