@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const papa = require("papaparse");
 const { Pool } = require("pg");
 require("dotenv").config();
 
@@ -14,43 +15,52 @@ const pool = new Pool({
 });
 
 const departments = [
+  "Agricultural and Environmental Engineering",
+  "Aerospace Engineering",
+  "Botany",
   "Building",
   "Chemical Engineering",
-  "Food Science and Engineering",
-  "Education",
-  "Agricultural and Environmental Engineering",
-  "Geology",
-  "Botany",
   "Civil Engineering",
-  "Surveying and Geoinformatics",
-  "Mechanical Engineering and Aerospace Engineering",
-  "Material Science and Engineering",
-  "Microbiology",
-  "Physics and Physics Engineering",
   "Computer Science and Engineering",
-  "Postgraduate Computer Science and Engineering",
+  "Food Science and Technology",
+  "Geology",
+  "Management and Accounting",
+  "Materials Science and Engineering",
   "Mathematics",
+  "Mechanical Engineering",
+  "Microbiology",
+  "Physics",
+  "Science and Technology Education",
+  "Surveying and Geoinformatics",
   "Zoology",
 ];
+const weeks = [1, 2, 3, 4, 5, 6, 7];
+
+var week_number = 1;
+
+function titleCase(string) {
+  let title = string.toLowerCase();
+  return title.charAt(0).toUpperCase() + title.slice(1);
+}
 
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get("/", async (req, res) => {
-  let message = req.query.message || "";
+  var message = req.query.message || "";
   res.render("index", { message });
 });
 
 app.post("/grade", async (req, res) => {
-  let message;
-  const registration_number = req.body.registration_number;
+  var message;
+  var registration_number = req.body.registration_number;
+  registration_number = registration_number.toUpperCase();
 
   try {
     const client = await pool.connect();
     const result = await client.query(
-      "SELECT * FROM student_scores WHERE registration_number = $1",
-      [registration_number]
+      `SELECT * FROM student_scores WHERE registration_number = ${registration_number}`
     );
     const student = result.rows[0];
     client.release();
@@ -64,24 +74,25 @@ app.post("/grade", async (req, res) => {
       department,
     });
   } catch (error) {
-    message = "Could not score student.";
+    message = "Student does not exist in database.";
     res.redirect(`/?message=${message}`);
   }
 });
 
 app.post("/score", async (req, res) => {
-  let message;
-  const { score, registration_number } = req.body;
+  var message;
+  var { score, registration_number } = req.body;
+  registration_number = registration_number.toUpperCase();
 
   try {
     const client = await pool.connect();
     await client.query(
-      "UPDATE student_scores SET score = $1 WHERE registration_number = $2",
-      [score, registration_number]
+      `UPDATE student_scores SET week${week_number} = ${score} WHERE registration_number = '${registration_number}'`
     );
     client.release();
     message = `Set ${registration_number} score to ${score}.`;
   } catch (error) {
+    console.error(error);
     message = `Could not set score for ${registration_number}.`;
   }
 
@@ -93,8 +104,8 @@ app.get("/register", async (req, res) => {
 });
 
 app.post("/new_student", async (req, res) => {
-  let message;
-  const {
+  var message = null;
+  var {
     registration_number,
     first_name,
     middle_name,
@@ -103,19 +114,17 @@ app.post("/new_student", async (req, res) => {
     score,
   } = req.body;
 
+  registration_number = registration_number.toUpperCase();
+  first_name = titleCase(first_name);
+  middle_name = titleCase(middle_name);
+  last_name = titleCase(last_name);
+
   try {
     const client = await pool.connect();
     await client.query(
-      "INSERT INTO student_scores (registration_number, first_name, middle_name, last_name, department, score) VALUES ($1, $2, $3, $4, $5, $6)",
-      [
-        registration_number,
-        first_name,
-        middle_name,
-        last_name,
-        department,
-        score,
-      ]
+      `INSERT INTO student_scores (registration_number, first_name, middle_name, last_name, department, week${week_number}) VALUES ('${registration_number}', '${first_name}', '${middle_name}', '${last_name}', '${department}', ${score})`
     );
+
     client.release();
     message = `Created record for ${registration_number}.`;
   } catch (error) {}
@@ -129,29 +138,34 @@ app.get("/download", async (req, res) => {
     const results = await client.query("SELECT * FROM student_scores");
     const json_data = results.rows;
     client.release();
-    res.setHeader("Content-Type", "application/json");
-    res.setHeader("Content-Disposition", "attachment; filename=data.json");
-    res.send(JSON.stringify(json_data));
-  } catch (error) {}
+
+    const csv_data = papa.unparse(json_data);
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=student_scores.csv"
+    );
+    res.send(csv_data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error generating download");
+  }
 });
 
 app.get("/passcode", async (req, res) => {
-  res.render("passcode");
+  res.render("passcode", { weeks });
 });
 
-app.post("/reset", async (req, res) => {
-  let message;
-  const passcode = req.body.passcode;
+app.post("/reset", (req, res) => {
+  var message = null;
+  const { week, passcode } = req.body;
 
   if (passcode === process.env.PASSCODE) {
-    try {
-      const client = await pool.connect();
-      await client.query("UPDATE student_scores SET score = 0");
-      client.release();
-      message = "Reset students' scores.";
-    } catch (error) {
-      message = "Passcode incorrect.";
-    }
+    week_number = week;
+    message = `Set current week to ${week_number}.`;
+  } else {
+    message = "Passcode incorrect.";
   }
 
   res.redirect(`/?message=${message}`);

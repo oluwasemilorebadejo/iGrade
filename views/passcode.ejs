@@ -38,27 +38,40 @@
       </nav>
     </div>
     <div class="container-md">
-      <form action="/reset" method="post">
-        <div class="input-group mb-3">
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Passcode"
-            aria-label="Passcode"
-            aria-describedby="button-addon2"
-            id="passcode"
-            name="passcode"
-            required
-          />
-          <button
-            class="btn btn-outline-primary"
-            type="submit"
-            id="button-addon2"
-          >
-            Submit
-          </button>
+      <div class="card">
+        <div class="card-header">Set Week</div>
+        <div class="card-body">
+          <form action="/reset" method="post">
+            <div class="mb-3 row">
+              <label for="week" class="col-sm-3 col-form-label"
+                >Week:</label
+              >
+              <div class="col-sm-10">
+                <select class="form-select" id="week" name="week" required>
+                  <option value="" selected>Select week...</option>
+                  <% for (const week of weeks) { %>
+                  <option value="<%= week %>"><%= week %></option>
+                  <% } %>
+                </select>
+              </div>
+            </div> 
+            <div class="mb-3 row">
+              <label for="registration_number" class="col-sm-3 col-form-label"
+                >Passcode:</label
+              >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="passcode"
+                  name="passcode"
+                  required
+                />
+              </div>
+            </div>          
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
         </div>
-      </form>
-    </div>
+      </div>
   </body>
 </html>
