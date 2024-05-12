@@ -45,7 +45,7 @@
             role="group"
             aria-label="Basic outlined example"
           >
-            <a href="/passcode" class="btn btn-outline-primary">Reset</a>
+            <a href="/week" class="btn btn-outline-primary">Reset</a>
             <a href="/download" class="btn btn-primary">Download</a>
           </div>
         </div>
@@ -85,6 +85,25 @@
       setTimeout(function () {
         messageElement.style.display = "none";
       }, 3000);
+
+      const regNoInput = document.getElementById("registration_number");
+      regNoInput.addEventListener("keyup", (event) => {
+        const regNoText = regNoInput.value;
+        console.log(regNoText.length);
+        if (regNoText.length === 3 && event.keyCode !== 8) {
+          const isAlpha = /^[a-zA-Z]+$/.test(regNoText);
+          if (isAlpha) {
+            regNoInput.value = regNoText + "/20";
+          }
+        }
+
+        if (regNoText.length === 8 && event.keyCode !== 8) {
+          const isNumber = /^[0-9]+$/.test(regNoText.slice(4, 9));
+          if (isNumber) {
+            regNoInput.value = regNoText + "/";
+          }
+        }
+      });
     </script>
   </body>
 </html>

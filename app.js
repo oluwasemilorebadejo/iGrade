@@ -153,8 +153,8 @@ app.get("/download", async (req, res) => {
   }
 });
 
-app.get("/passcode", async (req, res) => {
-  res.render("passcode", { week_number, weeks });
+app.get("/week", async (req, res) => {
+  res.render("week", { week_number, weeks });
 });
 
 app.post("/reset", (req, res) => {

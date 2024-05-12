@@ -103,7 +103,12 @@
                 >Department:</label
               >
               <div class="col-sm-10">
-                <select class="form-select" id="department" name="department" required>
+                <select
+                  class="form-select"
+                  id="department"
+                  name="department"
+                  required
+                >
                   <option value="" selected>Select department...</option>
                   <% for (const department of departments) { %>
                   <option value="<%= department %>"><%= department %></option>
@@ -129,4 +134,24 @@
       </div>
     </div>
   </body>
+  <script>
+    const regNoInput = document.getElementById("registration_number");
+    regNoInput.addEventListener("keyup", (event) => {
+      const regNoText = regNoInput.value;
+      console.log(regNoText.length);
+      if (regNoText.length === 3 && event.keyCode !== 8) {
+        const isAlpha = /^[a-zA-Z]+$/.test(regNoText);
+        if (isAlpha) {
+          regNoInput.value = regNoText + "/20";
+        }
+      }
+
+      if (regNoText.length === 8 && event.keyCode !== 8) {
+        const isNumber = /^[0-9]+$/.test(regNoText.slice(4, 9));
+        if (isNumber) {
+          regNoInput.value = regNoText + "/";
+        }
+      }
+    });
+  </script>
 </html>
