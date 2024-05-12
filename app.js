@@ -135,7 +135,7 @@ app.post("/new_student", async (req, res) => {
 app.get("/download", async (req, res) => {
   try {
     const client = await pool.connect();
-    const results = await client.query("SELECT * FROM student_scores");
+    const results = await client.query("SELECT * FROM student_scores LIMIT 3000");
     const json_data = results.rows;
     client.release();
 
@@ -154,7 +154,7 @@ app.get("/download", async (req, res) => {
 });
 
 app.get("/passcode", async (req, res) => {
-  res.render("passcode", { weeks });
+  res.render("passcode", { week_number, weeks });
 });
 
 app.post("/reset", (req, res) => {
