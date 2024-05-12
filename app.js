@@ -60,7 +60,7 @@ app.post("/grade", async (req, res) => {
   try {
     const client = await pool.connect();
     const result = await client.query(
-      `SELECT * FROM student_scores WHERE registration_number = ${registration_number}`
+      `SELECT * FROM student_scores WHERE registration_number = '${registration_number}'`
     );
     const student = result.rows[0];
     client.release();
