@@ -49,8 +49,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get("/", async (req, res) => {
   var message = req.query.message || "";
-  res.render("index", { message });
+  res.render("index", { week_number, message });
 });
+
+
 
 app.post("/grade", async (req, res) => {
   var message;
@@ -74,7 +76,7 @@ app.post("/grade", async (req, res) => {
       department,
     });
   } catch (error) {
-    message = "Student does not exist in database.";
+    message = "I:Student does not exist in database.";
     res.redirect(`/?message=${message}`);
   }
 });
@@ -90,10 +92,9 @@ app.post("/score", async (req, res) => {
       `UPDATE student_scores SET week${week_number} = ${score} WHERE registration_number = '${registration_number}'`
     );
     client.release();
-    message = `Set ${registration_number} score to ${score}.`;
+    message = `S:Set ${registration_number} score to ${score}.`;
   } catch (error) {
-    console.error(error);
-    message = `Could not set score for ${registration_number}.`;
+    message = `E:Could not set score for ${registration_number}.`;
   }
 
   res.redirect(`/?message=${message}`);
@@ -126,8 +127,10 @@ app.post("/new_student", async (req, res) => {
     );
 
     client.release();
-    message = `Created record for ${registration_number}.`;
-  } catch (error) {}
+    message = `S:Created record for ${registration_number}.`;
+  } catch (error) {
+    message = "E:Error in connecting to database.";
+  }
 
   res.redirect(`/?message=${message}`);
 });
@@ -135,7 +138,9 @@ app.post("/new_student", async (req, res) => {
 app.get("/download", async (req, res) => {
   try {
     const client = await pool.connect();
-    const results = await client.query("SELECT * FROM student_scores LIMIT 3000");
+    const results = await client.query(
+      "SELECT * FROM student_scores LIMIT 3000"
+    );
     const json_data = results.rows;
     client.release();
 
@@ -148,7 +153,6 @@ app.get("/download", async (req, res) => {
     );
     res.send(csv_data);
   } catch (error) {
-    console.error(error);
     res.status(500).send("Error generating download");
   }
 });
@@ -163,9 +167,9 @@ app.post("/reset", (req, res) => {
 
   if (passcode === process.env.PASSCODE) {
     week_number = week;
-    message = `Set current week to ${week_number}.`;
+    message = `S:Set current week to ${week_number}.`;
   } else {
-    message = "Passcode incorrect.";
+    message = "I:Passcode incorrect.";
   }
 
   res.redirect(`/?message=${message}`);

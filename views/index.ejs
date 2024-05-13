@@ -22,7 +22,12 @@
       float: right;
     }
     p#message {
-      margin-top: 100px; /* Adjust the value for desired distance */
+      margin-top: 100px;
+      padding-left: 30px;
+      padding-right: 30px;
+    }
+    #registration_number {
+      margin-top: 50px;
     }
   </style>
   <body>
@@ -51,6 +56,15 @@
         </div>
       </nav>
     </div>
+    <div
+      class="centralized-heading d-flex justify-content-center align-items-center"
+    >
+      <h6>
+        Current week:
+        <span class="badge text-bg-secondary"><%= week_number %></span>
+      </h6>
+    </div>
+
     <div class="container-md">
       <form action="/grade" method="post">
         <div class="input-group mb-3">
@@ -76,34 +90,50 @@
         </div>
       </form>
     </div>
-    <p class="text-center" id="message"><%= message %></p>
-    <script>
-      const messageElement = document.getElementById("message");
-      function showAndHideMessage() {
-        messageElement.style.display = "block";
-      }
-      setTimeout(function () {
-        messageElement.style.display = "none";
-      }, 3000);
-
-      const regNoInput = document.getElementById("registration_number");
-      regNoInput.addEventListener("keyup", (event) => {
-        const regNoText = regNoInput.value;
-        console.log(regNoText.length);
-        if (regNoText.length === 3 && event.keyCode !== 8) {
-          const isAlpha = /^[a-zA-Z]+$/.test(regNoText);
-          if (isAlpha) {
-            regNoInput.value = regNoText + "/20";
-          }
-        }
-
-        if (regNoText.length === 8 && event.keyCode !== 8) {
-          const isNumber = /^[0-9]+$/.test(regNoText.slice(4, 9));
-          if (isNumber) {
-            regNoInput.value = regNoText + "/";
-          }
-        }
-      });
-    </script>
+    <div style="padding: 30px">
+      <p class="text-center" id="message"><%= message %></p>
+    </div>
   </body>
+  <script>
+    const messageElement = document.getElementById("message");
+    messageElement.classList.remove(...messageElement.classList);
+    messageElement.classList.add("text-center", "p-2");
+    if (messageElement.innerText.startsWith("S:")) {
+      messageElement.innerText = messageElement.innerText.slice(2);
+      messageElement.classList.add("text-bg-success");
+    } else if (messageElement.innerText.startsWith("E:")) {
+      messageElement.innerText = messageElement.innerText.slice(2);
+      messageElement.classList.add("text-bg-danger");
+    } else if (messageElement.innerText.startsWith("I:")) {
+      messageElement.innerText = messageElement.innerText.slice(2);
+      messageElement.classList.add("text-bg-info");
+    }
+
+    setTimeout(showAndHideMessage, 3000);
+
+    function showAndHideMessage() {
+      messageElement.style.display = "none";
+    }
+
+    const regNoInput = document.getElementById("registration_number");
+    regNoInput.addEventListener("keyup", (event) => {
+      const regNoText = regNoInput.value;
+      console.log(regNoText.length);
+      if (regNoText.length === 3 && event.keyCode !== 8) {
+        const isAlpha = /^[a-zA-Z]+$/.test(regNoText);
+        if (isAlpha) {
+          regNoInput.value = regNoText + "/20";
+        }
+      }
+
+      if (regNoText.length === 8 && event.keyCode !== 8) {
+        const isNumber = /^[0-9]+$/.test(regNoText.slice(4, 9));
+        if (isNumber) {
+          regNoInput.value = regNoText + "/";
+        }
+      }
+    });
+
+    history.pushState({}, "", window.location.pathname);
+  </script>
 </html>
