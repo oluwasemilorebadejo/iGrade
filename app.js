@@ -52,8 +52,6 @@ app.get("/", async (req, res) => {
   res.render("index", { week_number, message });
 });
 
-
-
 app.post("/grade", async (req, res) => {
   var message;
   var registration_number = req.body.registration_number;
@@ -175,4 +173,4 @@ app.post("/reset", (req, res) => {
   res.redirect(`/?message=${message}`);
 });
 
-app.listen(port, () => console.log(`http://localhost:${port}`));
+app.listen(port);
