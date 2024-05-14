@@ -119,14 +119,14 @@
     regNoInput.addEventListener("keyup", (event) => {
       const regNoText = regNoInput.value;
       console.log(regNoText.length);
-      if (regNoText.length === 3 && event.keyCode !== 8) {
+      if (regNoText.length === 3 && event.key !== "Backspace") {
         const isAlpha = /^[a-zA-Z]+$/.test(regNoText);
         if (isAlpha) {
           regNoInput.value = regNoText + "/20";
         }
       }
 
-      if (regNoText.length === 8 && event.keyCode !== 8) {
+      if (regNoText.length === 8 && event.key !== "Backspace") {
         const isNumber = /^[0-9]+$/.test(regNoText.slice(4, 9));
         if (isNumber) {
           regNoInput.value = regNoText + "/";
