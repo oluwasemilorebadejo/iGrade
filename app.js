@@ -48,6 +48,10 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get("/", async (req, res) => {
+  res.redirect("/index");
+});
+
+app.get("/index", async (req, res) => {
   var message = req.query.message || "";
   res.render("index", { week_number, message });
 });
@@ -75,7 +79,7 @@ app.post("/grade", async (req, res) => {
     });
   } catch (error) {
     message = "I:Student does not exist in database.";
-    res.redirect(`/?message=${message}`);
+    res.redirect(`/index?message=${message}`);
   }
 });
 
@@ -95,14 +99,14 @@ app.post("/score", async (req, res) => {
     message = `E:Could not set score for ${registration_number}.`;
   }
 
-  res.redirect(`/?message=${message}`);
+  res.redirect(`/index?message=${message}`);
 });
 
 app.get("/register", async (req, res) => {
   res.render("register", { departments });
 });
 
-app.post("/new_student", async (req, res) => {
+app.post("/student", async (req, res) => {
   var message = null;
   var {
     registration_number,
@@ -130,7 +134,7 @@ app.post("/new_student", async (req, res) => {
     message = "E:Error in connecting to database.";
   }
 
-  res.redirect(`/?message=${message}`);
+  res.redirect(`/index?message=${message}`);
 });
 
 app.get("/download", async (req, res) => {
@@ -170,7 +174,7 @@ app.post("/reset", (req, res) => {
     message = "I:Passcode incorrect.";
   }
 
-  res.redirect(`/?message=${message}`);
+  res.redirect(`/index?message=${message}`);
 });
 
 app.listen(port);
