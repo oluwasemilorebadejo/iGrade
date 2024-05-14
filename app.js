@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const papa = require("papaparse");
+const session = require("express-session");
 const { Pool } = require("pg");
 require("dotenv").config();
 
@@ -43,20 +44,49 @@ function titleCase(string) {
   return title.charAt(0).toUpperCase() + title.slice(1);
 }
 
-app.set("view engine", "ejs");
+function isAuthenticated(req, res, next) {
+  if (req.session.isAuthenticated) {
+    next();
+  } else {
+    res.redirect("/");
+  }
+}
+
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(
+  session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+app.set("view engine", "ejs");
 
 app.get("/", async (req, res) => {
-  res.redirect("/index");
+  req.session.isAuthenticated = false;
+  var message = req.query.message || "";
+  res.render("auth", { message });
 });
 
-app.get("/index", async (req, res) => {
+app.post("/verify", async (req, res) => {
+  if (req.body.passcode === process.env.PASSCODE) {
+    req.session.isAuthenticated = true;
+    res.redirect("/index");
+  } else {
+    var message;
+    message = "I:Passcode incorrect.";
+    res.redirect(`/?message=${message}`);
+  }
+});
+
+app.get("/index", isAuthenticated, async (req, res) => {
   var message = req.query.message || "";
   res.render("index", { week_number, message });
 });
 
-app.post("/grade", async (req, res) => {
+app.post("/grade", isAuthenticated, async (req, res) => {
   var message;
   var registration_number = req.body.registration_number;
   registration_number = registration_number.toUpperCase();
@@ -83,7 +113,7 @@ app.post("/grade", async (req, res) => {
   }
 });
 
-app.post("/score", async (req, res) => {
+app.post("/score", isAuthenticated, async (req, res) => {
   var message;
   var { score, registration_number } = req.body;
   registration_number = registration_number.toUpperCase();
@@ -102,11 +132,11 @@ app.post("/score", async (req, res) => {
   res.redirect(`/index?message=${message}`);
 });
 
-app.get("/register", async (req, res) => {
+app.get("/register", isAuthenticated, async (req, res) => {
   res.render("register", { departments });
 });
 
-app.post("/student", async (req, res) => {
+app.post("/student", isAuthenticated, async (req, res) => {
   var message = null;
   var {
     registration_number,
@@ -137,7 +167,7 @@ app.post("/student", async (req, res) => {
   res.redirect(`/index?message=${message}`);
 });
 
-app.get("/download", async (req, res) => {
+app.get("/download", isAuthenticated, async (req, res) => {
   try {
     const client = await pool.connect();
     const results = await client.query(
@@ -159,11 +189,11 @@ app.get("/download", async (req, res) => {
   }
 });
 
-app.get("/week", async (req, res) => {
+app.get("/week", isAuthenticated, async (req, res) => {
   res.render("week", { week_number, weeks });
 });
 
-app.post("/reset", (req, res) => {
+app.post("/reset", isAuthenticated, (req, res) => {
   var message = null;
   const { week, passcode } = req.body;
 
@@ -175,6 +205,11 @@ app.post("/reset", (req, res) => {
   }
 
   res.redirect(`/index?message=${message}`);
+});
+
+app.get("/logout", isAuthenticated, async (req, res) => {
+  req.session.isAuthenticated = false;
+  res.redirect("/");
 });
 
 app.listen(port);
