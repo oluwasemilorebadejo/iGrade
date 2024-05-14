@@ -116,7 +116,7 @@
     }
 
     const regNoInput = document.getElementById("registration_number");
-    regNoInput.addEventListener("keyup", (event) => {
+    regNoInput.addEventListener("keypress", (event) => {
       const regNoText = regNoInput.value;
       console.log(regNoText.length);
       if (regNoText.length === 3 && event.key !== "Backspace") {
