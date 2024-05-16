@@ -161,6 +161,7 @@ app.post("/student", isAuthenticated, async (req, res) => {
     client.release();
     message = `S:Created record for ${registration_number}.`;
   } catch (error) {
+    console.log(error);
     message = "E:Error in connecting to database.";
   }
 
